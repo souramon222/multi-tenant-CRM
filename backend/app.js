@@ -73,6 +73,10 @@ app.get('/health', (req, res) => {
     });
 });
 
+app.get("/", (req, res) => {
+  res.json({ message: "Multi-Tenant CRM API running" });
+});
+
 // Route files
 const authRoutes = require('./routes/auth');
 const superadminRoutes = require('./routes/superadmin');
