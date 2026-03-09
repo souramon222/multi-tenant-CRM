@@ -1,0 +1,57 @@
+# -----------------------------
+# OS Files
+# -----------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------
+# Logs
+# -----------------------------
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# -----------------------------
+# Debug / Test Output Files
+# -----------------------------
+*_debug.txt
+test_*.txt
+*-output.txt
+
+# -----------------------------
+# Environment Variables
+# -----------------------------
+.env
+.env.*
+!.env.example
+
+# -----------------------------
+# Node Modules (extra safety)
+# -----------------------------
+node_modules/
+
+# -----------------------------
+# Build Artifacts
+# -----------------------------
+dist/
+build/
+coverage/
+
+# -----------------------------
+# IDE / Editor
+# -----------------------------
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# -----------------------------
+# Temporary Files
+# -----------------------------
+*.tmp
+*.temp

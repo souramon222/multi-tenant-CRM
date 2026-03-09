@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --color-primary: #F28C28;
+  --color-primary-light: #FFE5B4;
+  --color-primary-dark: #E07B20;
+  --color-primary-50: #FFF8ED;
+
+  --bg-main: #FFF8ED;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-header: #ffffff;
+  --bg-input: #ffffff;
+
+  --text-main: #1a1a1a;
+  --text-muted: #6b7280;
+  --text-header: #374151;
+
+  --border-main: #FFEFD6;
+  --border-light: #FFF8ED;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --font-sans: 'Poppins', system-ui, sans-serif;
+}
+
+:root[data-theme='dark'] {
+  --bg-main: #0f172a;
+  --bg-card: #1e293b;
+  --bg-sidebar: #0f172a;
+  --bg-header: #1e293b;
+  --bg-input: #334155;
+
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-header: #e2e8f0;
+
+  --border-main: #334155;
+  --border-light: #1e293b;
+
+  --color-primary-50: #1e293b;
+}
+
+@theme {
+  --color-primary: var(--color-primary);
+  --color-primary-light: var(--color-primary-light);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-primary-50: var(--color-primary-50);
+  --font-sans: var(--font-sans);
+}
+
+/* Base Styles */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Shared Components with Theme Support */
+.bg-card {
+  background-color: var(--bg-card);
+}
+
+.bg-sidebar {
+  background-color: var(--bg-sidebar);
+}
+
+.bg-header {
+  background-color: var(--bg-header);
+}
+
+.text-main {
+  color: var(--text-main);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.border-main {
+  border-color: var(--border-main);
+}
+
+/* Subtle fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.btn-hover {
+  transition: all 0.2s ease;
+}
+
+.btn-hover:hover {
+  transform: scale(1.02);
+}
+
+input,
+select,
+textarea {
+  background-color: var(--bg-input);
+  color: var(--text-main);
+  border-color: var(--border-main);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(242, 140, 40, 0.15) !important;
+  outline: none;
+}
+
+@layer base {
+  input[type="password"]::-ms-reveal,
+  input[type="password"]::-ms-clear {
+    display: none;
+  }
+}
