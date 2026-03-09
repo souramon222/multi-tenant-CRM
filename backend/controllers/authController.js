@@ -8,7 +8,7 @@ const { setCsrfCookie } = require('../middlewares/csrf');
 const cookieOptions = (maxAgeMs) => ({
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: maxAgeMs,
     path: '/',
 });
@@ -23,7 +23,7 @@ const clearAuthCookies = (res) => {
     const clearOptions = {
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     };
 
     res.clearCookie('accessToken', clearOptions);
