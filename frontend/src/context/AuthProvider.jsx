@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import api, { clearCsrfToken } from '../services/api';
 import { AuthContext } from './AuthContext';
 
 const AuthProvider = ({ children }) => {
@@ -10,6 +10,7 @@ const AuthProvider = ({ children }) => {
         const checkUser = async () => {
             try {
                 // If cookies are valid, this succeeds and we're logged in
+                // The response interceptor in api.js auto-captures the csrfToken
                 const res = await api.get('/auth/me');
                 if (res.data.success && res.data.data) {
                     setUser(res.data.data);
@@ -28,6 +29,7 @@ const AuthProvider = ({ children }) => {
 
     const login = (userData) => {
         // Cookies are already set by the backend — just update React state
+        // CSRF token is auto-captured by the response interceptor in api.js
         setUser(userData);
     };
 
@@ -37,6 +39,7 @@ const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Logout API call failed', error);
         }
+        clearCsrfToken();
         setUser(null);
     };
 
@@ -48,3 +51,4 @@ const AuthProvider = ({ children }) => {
 };
 
 export default AuthProvider;
+

@@ -5,24 +5,30 @@ const api = axios.create({
     withCredentials: true, // Send httpOnly cookies with every request
 });
 
-// Helper to read a cookie by name
-const getCookie = (name) => {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? match[2] : null;
-};
+// ── In-memory CSRF token store ──
+let csrfToken = null;
+
+export const setCsrfToken = (token) => { csrfToken = token; };
+export const clearCsrfToken = () => { csrfToken = null; };
 
 // Request interceptor — attach CSRF token to state-changing requests
 api.interceptors.request.use((config) => {
     const method = config.method?.toUpperCase();
-    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-        const csrfToken = getCookie('csrfToken');
-        if (csrfToken) {
-            config.headers['X-CSRF-Token'] = csrfToken;
-        }
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) && csrfToken) {
+        config.headers['X-CSRF-Token'] = csrfToken;
     }
     return config;
 }, (error) => {
     return Promise.reject(error);
+});
+
+// Response interceptor — auto-capture CSRF token from any response body
+api.interceptors.response.use((response) => {
+    const token = response.data?.data?.csrfToken;
+    if (token) {
+        csrfToken = token;
+    }
+    return response;
 });
 
 // Response interceptor for silent token refresh
@@ -70,11 +76,17 @@ api.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                await axios.post(
+                const refreshRes = await axios.post(
                     `${api.defaults.baseURL}/auth/refresh`,
                     {},
                     { withCredentials: true }
                 );
+
+                // Capture new CSRF token from refresh response
+                const newCsrfToken = refreshRes.data?.data?.csrfToken;
+                if (newCsrfToken) {
+                    csrfToken = newCsrfToken;
+                }
 
                 // Refresh succeeded — new cookies set automatically
                 processQueue(null);
@@ -93,3 +105,4 @@ api.interceptors.response.use(
 );
 
 export default api;
+

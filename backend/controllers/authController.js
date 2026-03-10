@@ -16,7 +16,8 @@ const cookieOptions = (maxAgeMs) => ({
 const setAuthCookies = (res, tokens) => {
     res.cookie('accessToken', tokens.accessToken, cookieOptions(60 * 60 * 1000)); // 1 hour
     res.cookie('refreshToken', tokens.refreshToken, cookieOptions(7 * 24 * 60 * 60 * 1000)); // 7 days
-    setCsrfCookie(res); // CSRF token for double-submit pattern
+    const csrfToken = setCsrfCookie(res); // CSRF token for double-submit pattern
+    return csrfToken;
 };
 
 const clearAuthCookies = (res) => {
@@ -36,11 +37,12 @@ const clearAuthCookies = (res) => {
 // @access  Public
 exports.registerCompany = asyncHandler(async (req, res) => {
     const result = await authService.registerCompany(req.body);
-    setAuthCookies(res, result.tokens);
+    const csrfToken = setAuthCookies(res, result.tokens);
 
     sendResponse(res, 201, true, 'Company registered successfully', {
         ...result.user,
         company: result.company,
+        csrfToken,
     });
 });
 
@@ -49,11 +51,12 @@ exports.registerCompany = asyncHandler(async (req, res) => {
 // @access  Public
 exports.login = asyncHandler(async (req, res) => {
     const result = await authService.login(req.body);
-    setAuthCookies(res, result.tokens);
+    const csrfToken = setAuthCookies(res, result.tokens);
 
     sendResponse(res, 200, true, 'Login successful', {
         ...result.user,
         company: result.company,
+        csrfToken,
     });
 });
 
@@ -69,8 +72,8 @@ exports.refreshToken = asyncHandler(async (req, res, next) => {
 
     try {
         const result = await authService.refreshToken(token);
-        setAuthCookies(res, result.tokens);
-        sendResponse(res, 200, true, 'Token refreshed');
+        const csrfToken = setAuthCookies(res, result.tokens);
+        sendResponse(res, 200, true, 'Token refreshed', { csrfToken });
     } catch (error) {
         clearAuthCookies(res);
         next(error);
@@ -100,9 +103,13 @@ exports.getMe = asyncHandler(async (req, res) => {
     const user = await authService.getCurrentUser(req.user.id);
 
     // Ensure CSRF cookie exists (covers sessions established before CSRF was deployed)
-    if (!req.cookies?.csrfToken) {
-        setCsrfCookie(res);
+    let csrfToken = req.cookies?.csrfToken || null;
+    if (!csrfToken) {
+        csrfToken = setCsrfCookie(res);
     }
 
-    sendResponse(res, 200, true, 'User data retrieved', user);
+    sendResponse(res, 200, true, 'User data retrieved', {
+        ...(user.toObject ? user.toObject() : user),
+        csrfToken,
+    });
 });
